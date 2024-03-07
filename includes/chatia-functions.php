@@ -156,28 +156,6 @@ function chatia_options_page_content()
             <?php submit_button(); ?>
         </form>
     </div>
-
-    <script>
-        jQuery(document).ready(function($) {
-            // Selector de colores
-            $('#chatia_button_color').wpColorPicker();
-
-            // Manejo del cargador de medios para la imagen
-            $('#chatia_upload_image_button').click(function(e) {
-                e.preventDefault();
-                var image = wp.media({
-                        title: 'Select Image',
-                        multiple: false
-                    }).open()
-                    .on('select', function(e) {
-                        var uploaded_image = image.state().get('selection').first();
-                        var image_url = uploaded_image.toJSON().url;
-                        $('#chatia_image_id').val(uploaded_image.id);
-                        $('#chatia_image_preview').attr('src', image_url);
-                    });
-            });
-        });
-    </script>
 <?php
 }
 
