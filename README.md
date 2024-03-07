@@ -35,7 +35,7 @@ Si encuentras algún error o tienes alguna sugerencia, por favor, abre un proble
 
 ## Soporte
 
-Para obtener ayuda o soporte técnico, por favor, contacta con nosotros en [nuestra página web](http://metricads.marketing).
+Para obtener ayuda o soporte técnico, por favor, contacta conmigo en [mi página web](http://metricads.marketing).
 
 ## Licencia
 
