@@ -4,7 +4,7 @@ Plugin Name: Chatia
 Description: Plugin para mostrar un chatbot en WordPress.
 Version: 0.1
 Author: Jorge Quispe
-GitHub Plugin URI: https://github.com/tu_usuario/tu_repositorio
+GitHub Plugin URI: https://github.com/JorgeEdQuispe/chatia
 Website: http://metricads.marketing
 Author URI: http://metricads.marketing
 */
