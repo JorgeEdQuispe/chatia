@@ -3,14 +3,26 @@
 function generate_chatia_html()
 {
     ob_start(); // Iniciar el almacenamiento en búfer de salida
-
+    $image_id = get_option('chatia_image_id');
 ?>
+
     <section>
         <div id="chatContainer" class="bg-white p-2 rounded-lg" style="margin: auto;">
             <!-- Heading -->
-            <div class="flex flex-row space-y-1.5 pb-6 items-center">
-                <img loading="lazy" class="rounded-full w-20 h-20 self-center object-cover" src="<?php echo esc_url(get_option('chatia_image_url')); ?>">
-                <div>
+            <div class="flex flex-row space-y-1.5 pb-2 items-center border-b-gray-400 border-b-2">
+                <?php
+                $image_id = get_option('chatia_image_id'); // Obtener el ID de la imagen de la opción
+
+                if ($image_id) {
+                    $image_url = wp_get_attachment_image_url($image_id, 'full'); // Obtener la URL de la imagen con el tamaño completo ('full')
+
+                    if ($image_url) {
+                        echo '<div class=" overflow-hidden rounded-full rounded-full bg-gray-100 border w-20 h-20"><img loading="lazy" class="rounded-full w-20 h-20 self-center object-cover bg-[#1e1919]" src="' . esc_url($image_url) . '" alt="Imagen"></div>';
+                    }
+                }
+                ?>
+
+                <div class="pl-4">
                     <h2 class="font-semibold text-lg tracking-tight"><?php echo esc_html(get_option('chatia_chatbot_name')); ?></h2>
                     <p class="text-sm text-[#6b7280] leading-3"><?php echo esc_html(get_option('chatia_description')); ?></p>
                 </div>
@@ -55,11 +67,11 @@ function generate_chatia_html()
             chatContainer.innerHTML += userMessageHtml;
 
             // Mostrar indicador de carga
-            var loadingHtml = '<div class="flex gap-3 my-4 text-gray-600 text-sm flex-1 animate-pulse"><span class="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8"><div class="rounded-full bg-gray-100 border"><img loading="lazy" class="rounded-full  self-center object-cover"src="https://static.vecteezy.com/system/resources/previews/000/550/731/original/user-icon-vector.jpg"></div></span></div>';
+            var loadingHtml = '<div class="flex gap-3 my-4 text-gray-600 text-sm flex-1 animate-pulse"><span class="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8"><div class="rounded-full bg-gray-100 border"><img loading="lazy" class="rounded-full  self-center object-cover"src="<?php echo esc_url($image_url) ?>"></div></span></div>';
             chatContainer.innerHTML += loadingHtml;
 
             // Realiza la solicitud POST a la ruta /ask
-            fetch('http://127.0.0.1:5000/ask', {
+            fetch('<?php echo esc_attr(get_option('chatia_url')); ?>', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -72,7 +84,7 @@ function generate_chatia_html()
                     chatContainer.removeChild(chatContainer.lastChild);
 
                     // Maneja la respuesta del servidor
-                    var botReplyHtml = '<div class="flex gap-3 my-4 text-gray-600 text-sm flex-1"><span class="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8"><div class="rounded-full bg-gray-100 border"><img loading="lazy" class="rounded-full  self-center object-cover"src="https://static.vecteezy.com/system/resources/previews/000/550/731/original/user-icon-vector.jpg"></div></span><div><span class="block font-bold text-gray-700">AI </span><p class="leading-relaxed">' + data.bot_reply + '</p></div></div>';
+                    var botReplyHtml = '<div class="flex gap-3 my-4 text-gray-600 text-sm flex-1"><span class="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8"><div class="rounded-full bg-gray-100 border"><img loading="lazy" class="rounded-full  self-center object-cover"src="<?php echo esc_url($image_url) ?>"></div></span><div><span class="block font-bold text-gray-700"><?php echo esc_html(get_option('chatia_chatbot_name')); ?> </span><p class="leading-relaxed">' + data.bot_reply + '</p></div></div>';
                     chatContainer.innerHTML += botReplyHtml;
 
                     // Habilitar el botón de enviar después de recibir la respuesta
@@ -109,6 +121,13 @@ function register_chatia_shortcode()
 {
     add_shortcode('chatia', 'generate_chatia_html');
 }
+
+// En tu archivo de funciones o donde estés configurando tus opciones
+function chatia_enqueue_media()
+{
+    wp_enqueue_media();
+}
+add_action('admin_enqueue_scripts', 'chatia_enqueue_media');
 
 // Contenido de la página de opciones
 function chatia_options_page_content()
@@ -152,12 +171,42 @@ function chatia_options_page_content()
                     <th scope="row">Description</th>
                     <td><input type="text" name="chatia_description" value="<?php echo esc_attr(get_option('chatia_description')); ?>" /></td>
                 </tr>
+                <tr valign="top">
+                    <th scope="row">URL</th>
+                    <td><input type="text" name="chatia_url" value="<?php echo esc_attr(get_option('chatia_url')); ?>" /></td>
+                </tr>
             </table>
             <?php submit_button(); ?>
         </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var chatiaUploadImageButton = document.getElementById('chatia_upload_image_button');
+            var chatiaImageIdInput = document.getElementById('chatia_image_id');
+            var chatiaImagePreview = document.getElementById('chatia_image_preview');
+
+            chatiaUploadImageButton.addEventListener('click', function() {
+                var mediaUploader = wp.media({
+                    title: 'Choose Image',
+                    button: {
+                        text: 'Choose Image'
+                    },
+                    multiple: false
+                });
+
+                mediaUploader.on('select', function() {
+                    var attachment = mediaUploader.state().get('selection').first().toJSON();
+                    chatiaImageIdInput.value = attachment.id;
+                    chatiaImagePreview.src = attachment.url;
+                });
+
+                mediaUploader.open();
+            });
+        });
+    </script>
 <?php
 }
+
 
 // Función para agregar opciones personalizadas al panel de administración
 function chatia_register_settings()
@@ -166,11 +215,13 @@ function chatia_register_settings()
     add_option('chatia_button_color', '#ffffff');
     add_option('chatia_chatbot_name', 'Chatbot');
     add_option('chatia_description', 'Powered by spawndev.uk');
+    add_option('chatia_url', 'http://127.0.0.1:5000/ask');
 
     register_setting('chatia_options_group', 'chatia_image_id');
     register_setting('chatia_options_group', 'chatia_button_color');
     register_setting('chatia_options_group', 'chatia_chatbot_name');
     register_setting('chatia_options_group', 'chatia_description');
+    register_setting('chatia_options_group', 'chatia_url');
 }
 
 // Función para agregar la página de opciones al panel de administración
