@@ -17,14 +17,14 @@ function generate_chatia_html()
                     $image_url = wp_get_attachment_image_url($image_id, 'full'); // Obtener la URL de la imagen con el tamaño completo ('full')
 
                     if ($image_url) {
-                        echo '<div class=" overflow-hidden rounded-full rounded-full bg-gray-100 border w-20 h-20"><img loading="lazy" class="rounded-full w-20 h-20 self-center object-cover bg-[#1e1919]" src="' . esc_url($image_url) . '" alt="Imagen"></div>';
+                        echo  '<div class="relative rounded-full bg-gray-100 border w-20 h-20"><div class="h-5 w-5 bg-green-400 absolute top-0 right-0 rounded-full animate-pulse"></div><div class=" overflow-hidden rounded-full bg-gray-100 border w-20 h-20"><img loading="lazy" class="rounded-full w-20 h-20 self-center object-cover bg-[#1e1919]" src="' . esc_url($image_url) . '" alt="Imagen"></div></div>';
                     }
                 }
                 ?>
 
                 <div class="pl-4">
-                    <h2 class="font-semibold text-lg tracking-tight"><?php echo esc_html(get_option('chatia_chatbot_name')); ?></h2>
-                    <p class="text-sm text-[#6b7280] leading-3"><?php echo esc_html(get_option('chatia_description')); ?></p>
+                    <h2 class="font-semibold text-xl tracking-tight"><?php echo esc_html(get_option('chatia_chatbot_name')); ?></h2>
+                    <p class="text-sm text-[#6b7280] mt-1 leading-3"><?php echo esc_html(get_option('chatia_description')); ?></p>
                 </div>
             </div>
 
