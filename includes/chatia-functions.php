@@ -26,6 +26,20 @@ function generate_chatia_html()
                     <h2 class="font-semibold text-xl tracking-tight"><?php echo esc_html(get_option('chatia_chatbot_name')); ?></h2>
                     <p class="text-sm text-[#6b7280] mt-1 leading-3"><?php echo esc_html(get_option('chatia_description')); ?></p>
                 </div>
+                <div class="pl-1 ml-auto">
+
+                    <?php
+                    $image_logo_id = get_option('chatia_logo_id'); // Obtener el ID de la imagen de la opción
+
+                    if ($image_logo_id) {
+                        $image_logo_url = wp_get_attachment_image_url($image_logo_id, 'full'); // Obtener la URL de la imagen con el tamaño completo ('full')
+
+                        if ($image_logo_url) {
+                            echo  '<div class="relative max-w-32 h-auto"><div class=""><img loading="lazy" class="" src="' . esc_url($image_logo_url) . '" alt="Imagen"></div></div>';
+                        }
+                    }
+                    ?>
+                </div>
             </div>
 
             <!-- Chat Container -->
@@ -138,31 +152,29 @@ function chatia_options_page_content()
         <form method="post" action="options.php">
             <?php settings_fields('chatia_options_group'); ?>
             <table class="form-table">
-                <tr valign="top">
-                    <th scope="row">Image</th>
-                    <td>
-                        <?php
-                        $image_id = get_option('chatia_image_id');
-                        $image_url = wp_get_attachment_url($image_id);
-                        ?>
-                        <input type="hidden" name="chatia_image_id" id="chatia_image_id" value="<?php echo esc_attr($image_id); ?>">
-                        <img id="chatia_image_preview" src="<?php echo esc_attr($image_url); ?>" style="max-width: 100px; max-height: 100px;"><br>
-                        <button type="button" class="button" id="chatia_upload_image_button">Select Image</button>
-                    </td>
-                </tr>
+                <?php
+                // Función para mostrar el campo de entrada de imagen
+                function chatia_render_image_input($input_name, $image_id_name, $image_preview_id)
+                {
+                    $image_id = get_option($image_id_name);
+                    $image_url = wp_get_attachment_url($image_id);
+                ?>
+                    <tr valign="top">
+                        <th scope="row">Image</th>
+                        <td>
+                            <input type="hidden" name="<?php echo esc_attr($input_name); ?>" id="<?php echo esc_attr($image_id_name); ?>" value="<?php echo esc_attr($image_id); ?>">
+                            <img id="<?php echo esc_attr($image_preview_id); ?>" src="<?php echo esc_attr($image_url); ?>" style="max-width: 100px; max-height: 100px;"><br>
+                            <button type="button" class="button chatia-upload-image-button">Select Image</button>
+                        </td>
+                    </tr>
+                <?php
+                }
+                ?>
+                <?php chatia_render_image_input('chatia_image_id', 'chatia_image_id', 'chatia_image_preview'); ?>
                 <tr valign="top">
                     <th scope="row">Button Color</th>
-                    <td>
-                        <?php
-                        $button_color = get_option('chatia_button_color');
-                        if (empty($button_color)) {
-                            $button_color = '#ffffff';
-                        }
-                        ?>
-                        <input type="text" id="chatia_button_color" name="chatia_button_color" value="<?php echo esc_attr($button_color); ?>" />
-                    </td>
+                    <td><input type="text" id="chatia_button_color" name="chatia_button_color" value="<?php echo esc_attr(get_option('chatia_button_color', '#ffffff')); ?>" /></td>
                 </tr>
-
                 <tr valign="top">
                     <th scope="row">Chatbot Name</th>
                     <td><input type="text" name="chatia_chatbot_name" value="<?php echo esc_attr(get_option('chatia_chatbot_name')); ?>" /></td>
@@ -175,37 +187,42 @@ function chatia_options_page_content()
                     <th scope="row">URL</th>
                     <td><input type="text" name="chatia_url" value="<?php echo esc_attr(get_option('chatia_url')); ?>" /></td>
                 </tr>
+                <?php chatia_render_image_input('chatia_logo_id', 'chatia_logo_id', 'chatia_image_preview_logo'); ?>
             </table>
             <?php submit_button(); ?>
         </form>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var chatiaUploadImageButton = document.getElementById('chatia_upload_image_button');
-            var chatiaImageIdInput = document.getElementById('chatia_image_id');
-            var chatiaImagePreview = document.getElementById('chatia_image_preview');
+            var chatiaUploadImageButtons = document.querySelectorAll('.chatia-upload-image-button');
 
-            chatiaUploadImageButton.addEventListener('click', function() {
-                var mediaUploader = wp.media({
-                    title: 'Choose Image',
-                    button: {
-                        text: 'Choose Image'
-                    },
-                    multiple: false
+            chatiaUploadImageButtons.forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var mediaUploader = wp.media({
+                        title: 'Choose Image',
+                        button: {
+                            text: 'Choose Image'
+                        },
+                        multiple: false
+                    });
+
+                    mediaUploader.on('select', function() {
+                        var attachment = mediaUploader.state().get('selection').first().toJSON();
+                        var imageIdInput = button.parentElement.querySelector('input[type="hidden"]');
+                        var imagePreview = button.parentElement.querySelector('img');
+                        imageIdInput.value = attachment.id;
+                        imagePreview.src = attachment.url;
+                    });
+
+                    mediaUploader.open();
                 });
-
-                mediaUploader.on('select', function() {
-                    var attachment = mediaUploader.state().get('selection').first().toJSON();
-                    chatiaImageIdInput.value = attachment.id;
-                    chatiaImagePreview.src = attachment.url;
-                });
-
-                mediaUploader.open();
             });
         });
     </script>
 <?php
 }
+
+
 
 
 // Función para agregar opciones personalizadas al panel de administración
@@ -216,12 +233,15 @@ function chatia_register_settings()
     add_option('chatia_chatbot_name', 'Chatbot');
     add_option('chatia_description', 'Powered by spawndev.uk');
     add_option('chatia_url', 'http://127.0.0.1:5000/ask');
+    add_option('chatia_logo_id', ''); // Cambiado a almacenar la ID de la imagen en lugar de la URL
+
 
     register_setting('chatia_options_group', 'chatia_image_id');
     register_setting('chatia_options_group', 'chatia_button_color');
     register_setting('chatia_options_group', 'chatia_chatbot_name');
     register_setting('chatia_options_group', 'chatia_description');
     register_setting('chatia_options_group', 'chatia_url');
+    register_setting('chatia_options_group', 'chatia_logo_id');
 }
 
 // Función para agregar la página de opciones al panel de administración
