@@ -49,8 +49,8 @@ function generate_chatia_html()
 
             <!-- Input box -->
             <div class="flex items-center pt-0">
-                <input id="user-input" class=" whitespace-pre-wrap  flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2" placeholder="Escribe tu mensaje" value="" onkeypress="handleKeyPress(event)">
-                <button onclick="sendMessage()" class="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] disabled:pointer-events-none disabled:opacity-50 bg-[<?php echo esc_html(get_option('chatia_button_color')); ?>] hover:bg-[#111827E6] h-10 px-4 py-2 border-x-4 border border-[#ffffff00]">Enviar</button>
+                <input id="user-input" class=" whitespace-pre-wrap  flex h-10 w-full rounded-l-lg border-[#e5e7eb] px-3 py-2 text-lg placeholder-[#6f737a] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2" placeholder="Escribe tu mensaje" value="" onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()" class="inline-flex items-center justify-center rounded-r-lg text-lg font-medium text-[#f9fafb] border border-red-50 disabled:pointer-events-none disabled:opacity-50 bg-[<?php echo esc_html(get_option('chatia_button_color')); ?>] hover:bg-[#111827E6] h-10 px-3 py-6">Enviar</button>
             </div>
         </div>
     </section>
