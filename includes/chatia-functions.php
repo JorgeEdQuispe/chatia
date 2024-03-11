@@ -7,9 +7,9 @@ function generate_chatia_html()
 ?>
 
     <section>
-        <div id="chatContainer" class="bg-white p-2 rounded-lg" style="margin: auto;">
+        <div id="chatContainer" class="bg-white p-2">
             <!-- Heading -->
-            <div class="flex flex-row space-y-1.5 pb-2 items-center border-b-gray-400 border-b-2">
+            <div class="flex flex-row space-y-1.5 pb-2 items-center border-b-gray-400 border-b-2 bg-white">
                 <?php
                 $image_id = get_option('chatia_image_id'); // Obtener el ID de la imagen de la opción
 
@@ -43,12 +43,12 @@ function generate_chatia_html()
             </div>
 
             <!-- Chat Container -->
-            <div id="messageContainer" class="pr-4 h-[474px]" style="min-width: 100%; display: table;">
+            <div id="messageContainer" class="pr-4 h-[412px]" style="min-width: 100%; display: table;">
                 <!-- Messages will appear here -->
             </div>
 
             <!-- Input box -->
-            <div class="flex items-center pt-0">
+            <div class="flex items-center pt-0 pb-1">
                 <input id="user-input" class=" whitespace-pre-wrap  flex h-10 w-full rounded-l-lg border-[#e5e7eb] px-3 py-2 text-lg placeholder-[#6f737a] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2" placeholder="Escribe tu mensaje" value="" onkeypress="handleKeyPress(event)">
                 <button onclick="sendMessage()" class="inline-flex items-center justify-center rounded-r-lg text-lg font-medium text-[#f9fafb] border border-red-50 disabled:pointer-events-none disabled:opacity-50 bg-[<?php echo esc_html(get_option('chatia_button_color')); ?>] hover:bg-[#111827E6] h-10 px-3 py-6">Enviar</button>
             </div>
